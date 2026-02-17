@@ -212,8 +212,6 @@ function BarChart({
       <div style={styles.barList}>
         {entries.map(([key, value]) => {
           const barColor = colorMap?.[key]?.text || color || colors.primary
-          const barBg =
-            colorMap?.[key]?.bg || `${color}22` || colors.primaryMuted
 
           return (
             <div key={key} style={styles.barRow}>

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import {
   Database,
-  Play,
   Code,
   ChevronDown,
   ChevronRight,
@@ -11,7 +10,6 @@ import type { ESQLResult } from '../types'
 import { api } from '../api/client'
 import { colors, radius } from '../styles/theme'
 import { Card } from './ui/Card'
-import { Button } from './ui/Button'
 import { Badge } from './ui/Badge'
 
 const PRESET_QUERIES = [

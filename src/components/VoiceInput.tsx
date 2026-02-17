@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Mic, MicOff, Square, Loader2, Send, ArrowRight } from 'lucide-react'
+import { Mic, Square, Loader2, ArrowRight } from 'lucide-react'
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder'
 import { api } from '../api/client'
 import { colors, radius, shadows, transitions } from '../styles/theme'

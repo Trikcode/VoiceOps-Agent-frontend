@@ -39,6 +39,10 @@ export const colors = {
   info: '#3b82f6',
   infoMuted: '#2563eb',
   infoBg: 'rgba(59, 130, 246, 0.1)',
+
+  border: '#3a3a4a',
+  bgHeader: '#1a1f2e',
+  green: '#22c55e',
 }
 
 export const shadows = {
