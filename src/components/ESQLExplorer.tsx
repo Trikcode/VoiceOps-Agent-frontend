@@ -13,36 +13,14 @@ import { Card } from './ui/Card'
 import { Badge } from './ui/Badge'
 
 const PRESET_QUERIES = [
-  {
-    id: 'recent-actions',
-    name: 'Recent Actions',
-    description: 'Get the latest agent actions with timing',
-    endpoint: 'recent-actions',
-  },
-  {
-    id: 'action-stats',
-    name: 'Action Statistics',
-    description: 'Aggregate stats including success rate',
-    endpoint: 'action-stats',
-  },
+  { id: 'recent-actions', name: 'Recent Actions', endpoint: 'recent-actions' },
+  { id: 'action-stats', name: 'Action Stats', endpoint: 'action-stats' },
   {
     id: 'tickets-by-priority',
-    name: 'Tickets by Priority',
-    description: 'Distribution of tickets by priority level',
+    name: 'By Priority',
     endpoint: 'tickets-by-priority',
   },
-  {
-    id: 'slow-actions',
-    name: 'Slow Actions',
-    description: 'Actions that took longer than 2 seconds',
-    endpoint: 'slow-actions',
-  },
-  {
-    id: 'daily-summary',
-    name: 'Daily Summary',
-    description: 'Action counts and durations by day',
-    endpoint: 'daily-summary',
-  },
+  { id: 'slow-actions', name: 'Slow Actions', endpoint: 'slow-actions' },
 ]
 
 export function ESQLExplorer() {
@@ -65,20 +43,18 @@ export function ESQLExplorer() {
   }
 
   return (
-    <Card padding='md'>
+    <Card padding='sm'>
       <div style={styles.header}>
         <div style={styles.headerLeft}>
           <div style={styles.iconContainer}>
-            <Database size={20} color={colors.primary} />
+            <Database size={18} color={colors.primary} />
           </div>
           <div>
             <h3 style={styles.title}>ES|QL Explorer</h3>
-            <p style={styles.subtitle}>
-              Run Elasticsearch Query Language queries
-            </p>
+            <p style={styles.subtitle}>Run live queries</p>
           </div>
         </div>
-        <Badge variant='info'>Live Queries</Badge>
+        <Badge variant='info'>Live</Badge>
       </div>
 
       <div style={styles.queryGrid}>
@@ -94,17 +70,14 @@ export function ESQLExplorer() {
                 : {}),
             }}
           >
-            <div style={styles.queryCardHeader}>
-              <Code size={16} color={colors.primary} />
-              <span style={styles.queryName}>{query.name}</span>
-              {isLoading && selectedQuery === query.endpoint && (
-                <Loader2
-                  size={14}
-                  style={{ animation: 'spin 1s linear infinite' }}
-                />
-              )}
-            </div>
-            <p style={styles.queryDesc}>{query.description}</p>
+            <Code size={14} color={colors.primary} />
+            <span style={styles.queryName}>{query.name}</span>
+            {isLoading && selectedQuery === query.endpoint && (
+              <Loader2
+                size={12}
+                style={{ animation: 'spin 1s linear infinite' }}
+              />
+            )}
           </button>
         ))}
       </div>
@@ -116,11 +89,11 @@ export function ESQLExplorer() {
             style={styles.queryToggle}
           >
             {expandedQuery ? (
-              <ChevronDown size={16} />
+              <ChevronDown size={14} />
             ) : (
-              <ChevronRight size={16} />
+              <ChevronRight size={14} />
             )}
-            <span>View ES|QL Query</span>
+            <span>View Query</span>
           </button>
 
           {expandedQuery && result.query && (
@@ -137,13 +110,12 @@ export function ESQLExplorer() {
                     {result.columns.map((col, i) => (
                       <th key={i} style={styles.th}>
                         {col.name}
-                        <span style={styles.colType}>{col.type}</span>
                       </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {result.values.slice(0, 10).map((row, i) => (
+                  {result.values.slice(0, 5).map((row, i) => (
                     <tr key={i}>
                       {row.map((cell, j) => (
                         <td key={j} style={styles.td}>
@@ -154,9 +126,9 @@ export function ESQLExplorer() {
                   ))}
                 </tbody>
               </table>
-              {result.values.length > 10 && (
+              {result.values.length > 5 && (
                 <p style={styles.moreRows}>
-                  Showing 10 of {result.values.length} rows
+                  +{result.values.length - 5} more rows
                 </p>
               )}
             </div>
@@ -178,15 +150,9 @@ function formatCell(value: any): string {
   if (value === null || value === undefined) return '—'
   if (typeof value === 'boolean') return value ? '✓' : '✗'
   if (typeof value === 'number') return value.toLocaleString()
-  if (typeof value === 'string' && value.includes('T')) {
-    // Likely a timestamp
-    try {
-      return new Date(value).toLocaleString()
-    } catch {
-      return value
-    }
-  }
-  return String(value)
+  const str = String(value)
+  if (str.length > 30) return str.substring(0, 30) + '...'
+  return str
 }
 
 const styles: Record<string, React.CSSProperties> = {
@@ -194,118 +160,112 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 16,
+    gap: 12,
   },
   headerLeft: {
     display: 'flex',
     alignItems: 'center',
-    gap: 14,
+    gap: 10,
   },
   iconContainer: {
-    width: 44,
-    height: 44,
+    width: 36,
+    height: 36,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     background: `${colors.primary}15`,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
+    flexShrink: 0,
   },
   title: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 600,
     color: colors.textPrimary,
     margin: 0,
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: 12,
     color: colors.textMuted,
     margin: 0,
   },
   queryGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: 12,
-    marginBottom: 20,
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: 8,
+    marginBottom: 16,
   },
   queryCard: {
-    padding: 14,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '10px 12px',
     background: colors.bgElevated,
     border: `1px solid ${colors.borderSubtle}`,
     borderRadius: radius.md,
     cursor: 'pointer',
-    textAlign: 'left',
-    transition: 'all 150ms ease',
+    fontSize: 12,
+    color: colors.textSecondary,
   },
   queryCardActive: {
     borderColor: colors.primary,
     background: `${colors.primary}11`,
   },
-  queryCardHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
-  },
   queryName: {
     flex: 1,
-    fontSize: 13,
-    fontWeight: 600,
-    color: colors.textPrimary,
-  },
-  queryDesc: {
-    fontSize: 12,
-    color: colors.textMuted,
-    margin: 0,
-    lineHeight: 1.4,
+    fontWeight: 500,
   },
   resultContainer: {
     borderTop: `1px solid ${colors.borderSubtle}`,
-    paddingTop: 20,
+    paddingTop: 16,
   },
   queryToggle: {
     display: 'flex',
     alignItems: 'center',
-    gap: 6,
-    padding: '8px 12px',
+    gap: 4,
+    padding: '6px 10px',
     background: colors.bgElevated,
     border: `1px solid ${colors.borderSubtle}`,
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
     color: colors.textSecondary,
-    fontSize: 13,
+    fontSize: 12,
     cursor: 'pointer',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   queryCode: {
-    padding: 16,
+    padding: 12,
     background: '#0d1117',
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
     color: '#7ee787',
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: 'monospace',
     overflow: 'auto',
-    marginBottom: 16,
+    marginBottom: 12,
     whiteSpace: 'pre-wrap',
-    border: `1px solid ${colors.borderSubtle}`,
+    wordBreak: 'break-word',
   },
   error: {
-    padding: 16,
+    padding: 12,
     background: colors.errorBg,
     border: `1px solid ${colors.error}`,
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
     color: colors.error,
-    fontSize: 13,
+    fontSize: 12,
+    wordBreak: 'break-word',
   },
   tableWrapper: {
     overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch',
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
+    fontSize: 12,
   },
   th: {
     textAlign: 'left',
-    padding: '10px 12px',
-    fontSize: 11,
+    padding: '8px 10px',
+    fontSize: 10,
     fontWeight: 600,
     color: colors.textMuted,
     textTransform: 'uppercase',
@@ -313,25 +273,18 @@ const styles: Record<string, React.CSSProperties> = {
     background: colors.bgElevated,
     whiteSpace: 'nowrap',
   },
-  colType: {
-    display: 'block',
-    fontSize: 10,
-    fontWeight: 400,
-    color: colors.textMuted,
-    opacity: 0.7,
-  },
   td: {
-    padding: '10px 12px',
-    fontSize: 13,
+    padding: '8px 10px',
+    fontSize: 11,
     color: colors.textSecondary,
     borderBottom: `1px solid ${colors.borderSubtle}`,
     whiteSpace: 'nowrap',
   },
   moreRows: {
-    fontSize: 12,
+    fontSize: 11,
     color: colors.textMuted,
     textAlign: 'center',
-    padding: '12px 0',
+    padding: '10px 0',
     margin: 0,
   },
 }

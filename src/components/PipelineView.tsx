@@ -1,11 +1,4 @@
-import {
-  Target,
-  Search,
-  Brain,
-  ChevronRight,
-  AlertTriangle,
-  Ticket,
-} from 'lucide-react'
+import { Target, Search, Brain, AlertTriangle, Ticket } from 'lucide-react'
 import type { PipelineData } from '../types'
 import { colors, radius, priorityColors, statusColors } from '../styles/theme'
 import { Card } from './ui/Card'
@@ -22,30 +15,21 @@ export function PipelineView({ pipeline, transcript }: Props) {
   return (
     <div style={styles.container}>
       {/* Transcript */}
-      <Card padding='md'>
-        <div style={styles.transcriptHeader}>
-          <div style={styles.stepIndicator}>
-            <span style={styles.stepDot} />
-            INPUT
-          </div>
+      <Card padding='sm'>
+        <div style={styles.stepIndicator}>
+          <span style={styles.stepDot} />
+          INPUT
         </div>
         <p style={styles.transcript}>"{transcript}"</p>
       </Card>
 
-      <div style={styles.connector}>
-        <ChevronRight size={16} color={colors.textMuted} />
-      </div>
-
       {/* Step 1: Intent */}
-      <Card padding='md'>
+      <Card padding='sm'>
         <div style={styles.stepHeader}>
           <div style={styles.stepIcon}>
-            <Target size={18} color={colors.primary} />
+            <Target size={16} color={colors.primary} />
           </div>
-          <div>
-            <span style={styles.stepTitle}>Intent Extraction</span>
-            <span style={styles.stepSubtitle}>Step 1 of 3</span>
-          </div>
+          <span style={styles.stepTitle}>Intent</span>
         </div>
 
         <div style={styles.entityGrid}>
@@ -58,113 +42,71 @@ export function PipelineView({ pipeline, transcript }: Props) {
         </div>
       </Card>
 
-      <div style={styles.connector}>
-        <ChevronRight size={16} color={colors.textMuted} />
-      </div>
-
       {/* Step 2: Context */}
-      <Card padding='md'>
+      <Card padding='sm'>
         <div style={styles.stepHeader}>
           <div style={styles.stepIcon}>
-            <Search size={18} color={colors.info} />
+            <Search size={16} color={colors.info} />
           </div>
-          <div>
-            <span style={styles.stepTitle}>Context Retrieval</span>
-            <span style={styles.stepSubtitle}>Step 2 of 3 · Elasticsearch</span>
-          </div>
+          <span style={styles.stepTitle}>Context</span>
         </div>
 
         <div style={styles.contextStats}>
           <Badge variant='info'>
-            {step2_context.similar_tickets.length} similar tickets
+            {step2_context.similar_tickets.length} similar
           </Badge>
           <Badge variant='default'>
-            {step2_context.past_commands_found} past commands
-          </Badge>
-          <Badge variant='default'>
-            {step2_context.past_actions_found} past actions
+            {step2_context.past_commands_found} commands
           </Badge>
         </div>
 
         {step2_context.similar_tickets.slice(0, 2).map((ticket) => (
           <div key={ticket.ticket_id} style={styles.ticketCard}>
             <div style={styles.ticketHeader}>
-              <Ticket size={14} color={colors.textMuted} />
+              <Ticket size={12} color={colors.textMuted} />
               <code style={styles.ticketId}>{ticket.ticket_id}</code>
               <PriorityBadge priority={ticket.priority} />
-              <StatusBadge status={ticket.status} />
-              <span style={styles.score}>
-                {(
-                  ticket.relevance_score && ticket.relevance_score * 10
-                )?.toFixed(1)}
-                % match
-              </span>
             </div>
             <p style={styles.ticketSummary}>{ticket.summary}</p>
           </div>
         ))}
       </Card>
 
-      <div style={styles.connector}>
-        <ChevronRight size={16} color={colors.textMuted} />
-      </div>
-
       {/* Step 3: Reasoning */}
       <Card
-        padding='md'
-        highlight={
-          step3_plan.confidence === 'high'
-            ? 'success'
-            : step3_plan.confidence === 'medium'
-              ? 'warning'
-              : 'error'
-        }
+        padding='sm'
+        highlight={step3_plan.confidence === 'high' ? 'success' : 'warning'}
       >
         <div style={styles.stepHeader}>
           <div style={styles.stepIcon}>
-            <Brain size={18} color={colors.primary} />
+            <Brain size={16} color={colors.primary} />
           </div>
-          <div>
-            <span style={styles.stepTitle}>Reasoning & Planning</span>
-            <span style={styles.stepSubtitle}>
-              Step 3 of 3 · Agent Decision
-            </span>
-          </div>
+          <span style={styles.stepTitle}>Reasoning</span>
           <Badge
-            variant={
-              step3_plan.confidence === 'high'
-                ? 'success'
-                : step3_plan.confidence === 'medium'
-                  ? 'warning'
-                  : 'error'
-            }
+            variant={step3_plan.confidence === 'high' ? 'success' : 'warning'}
+            size='sm'
           >
-            {step3_plan.confidence} confidence
+            {step3_plan.confidence}
           </Badge>
         </div>
 
-        <div style={styles.reasoningBox}>
-          <p style={styles.reasoning}>{step3_plan.reasoning}</p>
-        </div>
+        <p style={styles.reasoning}>{step3_plan.reasoning}</p>
 
         {step3_plan.duplicate_warning && (
           <div style={styles.warning}>
-            <AlertTriangle size={16} />
-            {step3_plan.duplicate_warning}
+            <AlertTriangle size={14} />
+            <span>{step3_plan.duplicate_warning}</span>
           </div>
         )}
 
-        <div style={styles.actionsHeader}>
-          <span>{step3_plan.actions.length} action(s) planned</span>
+        <div style={styles.actions}>
+          {step3_plan.actions.map((action) => (
+            <div key={action.step} style={styles.actionRow}>
+              <span style={styles.actionStep}>{action.step}</span>
+              <span style={styles.actionDesc}>{action.description}</span>
+            </div>
+          ))}
         </div>
-
-        {step3_plan.actions.map((action) => (
-          <div key={action.step} style={styles.actionRow}>
-            <span style={styles.actionStep}>{action.step}</span>
-            <Badge variant='info'>{action.type}</Badge>
-            <span style={styles.actionDesc}>{action.description}</span>
-          </div>
-        ))}
       </Card>
     </div>
   )
@@ -205,33 +147,14 @@ function PriorityBadge({ priority }: { priority: string }) {
   return (
     <span
       style={{
-        fontSize: 11,
+        fontSize: 10,
         padding: '2px 6px',
         borderRadius: radius.sm,
         background: style.bg,
         color: style.text,
-        border: `1px solid ${style.border}`,
       }}
     >
       {priority}
-    </span>
-  )
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const style = statusColors[status] || statusColors.open
-  return (
-    <span
-      style={{
-        fontSize: 11,
-        padding: '2px 6px',
-        borderRadius: radius.sm,
-        background: style.bg,
-        color: style.text,
-        border: `1px solid ${style.border}`,
-      }}
-    >
-      {status}
     </span>
   )
 }
@@ -240,20 +163,17 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 4,
-  },
-  transcriptHeader: {
-    marginBottom: 8,
+    gap: 8,
   },
   stepIndicator: {
-    display: 'inline-flex',
+    display: 'flex',
     alignItems: 'center',
     gap: 6,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 600,
     color: colors.textMuted,
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
+    marginBottom: 6,
   },
   stepDot: {
     width: 6,
@@ -262,159 +182,145 @@ const styles: Record<string, React.CSSProperties> = {
     background: colors.success,
   },
   transcript: {
-    fontSize: 16,
+    fontSize: 14,
     color: colors.textPrimary,
     fontStyle: 'italic',
     margin: 0,
-    lineHeight: 1.5,
-  },
-  connector: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '4px 0',
+    lineHeight: 1.4,
+    wordBreak: 'break-word',
   },
   stepHeader: {
     display: 'flex',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
+    gap: 8,
+    marginBottom: 12,
+    flexWrap: 'wrap',
   },
   stepIcon: {
-    width: 36,
-    height: 36,
+    width: 28,
+    height: 28,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     background: colors.bgElevated,
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
+    flexShrink: 0,
   },
   stepTitle: {
-    display: 'block',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 600,
     color: colors.textPrimary,
-  },
-  stepSubtitle: {
-    display: 'block',
-    fontSize: 12,
-    color: colors.textMuted,
+    flex: 1,
   },
   entityGrid: {
     display: 'flex',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
   },
   entityTag: {
     display: 'flex',
     flexDirection: 'column',
-    padding: '8px 12px',
+    padding: '6px 10px',
     background: colors.bgElevated,
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
     border: `1px solid ${colors.borderSubtle}`,
-    minWidth: 100,
+    minWidth: 80,
   },
   entityLabel: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 600,
     color: colors.textMuted,
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   entityValue: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 600,
     color: colors.textPrimary,
+    wordBreak: 'break-word',
   },
   contextStats: {
     display: 'flex',
-    gap: 8,
-    marginBottom: 16,
+    gap: 6,
+    marginBottom: 12,
+    flexWrap: 'wrap',
   },
   ticketCard: {
-    padding: 12,
+    padding: 10,
     background: colors.bgElevated,
-    borderRadius: radius.md,
-    marginBottom: 8,
+    borderRadius: radius.sm,
+    marginBottom: 6,
   },
   ticketHeader: {
     display: 'flex',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
+    gap: 6,
+    marginBottom: 4,
+    flexWrap: 'wrap',
   },
   ticketId: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 600,
     color: colors.primary,
   },
-  score: {
-    marginLeft: 'auto',
-    fontSize: 11,
-    color: colors.textMuted,
-  },
   ticketSummary: {
-    fontSize: 13,
+    fontSize: 12,
     color: colors.textSecondary,
     margin: 0,
-    lineHeight: 1.4,
-  },
-  reasoningBox: {
-    padding: 16,
-    background: colors.bgElevated,
-    borderRadius: radius.md,
-    borderLeft: `3px solid ${colors.primary}`,
-    marginBottom: 16,
+    lineHeight: 1.3,
   },
   reasoning: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.textSecondary,
-    lineHeight: 1.6,
-    margin: 0,
+    lineHeight: 1.5,
+    margin: '0 0 12px',
+    padding: 10,
+    background: colors.bgElevated,
+    borderRadius: radius.sm,
+    borderLeft: `3px solid ${colors.primary}`,
+    wordBreak: 'break-word',
   },
   warning: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 8,
-    padding: 12,
+    padding: 10,
     background: colors.warningBg,
     border: `1px solid ${colors.warning}`,
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
     color: colors.warning,
-    fontSize: 13,
-    marginBottom: 16,
-  },
-  actionsHeader: {
     fontSize: 12,
-    fontWeight: 600,
-    color: colors.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
     marginBottom: 12,
+  },
+  actions: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
   },
   actionRow: {
     display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    padding: '10px 0',
+    alignItems: 'flex-start',
+    gap: 8,
+    padding: '8px 0',
     borderBottom: `1px solid ${colors.borderSubtle}`,
   },
   actionStep: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     background: colors.primary,
     color: '#fff',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 700,
     borderRadius: radius.sm,
+    flexShrink: 0,
   },
   actionDesc: {
-    fontSize: 13,
+    fontSize: 12,
     color: colors.textSecondary,
-    flex: 1,
+    lineHeight: 1.4,
+    wordBreak: 'break-word',
   },
 }

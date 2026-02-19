@@ -15,10 +15,9 @@ import { colors, radius } from './styles/theme'
 type Tab = 'agent' | 'audit' | 'tickets' | 'analytics' | 'esql'
 
 const SAMPLE_COMMANDS = [
-  'Create a ticket for the login page freezing after 3 wrong passwords on Safari, high priority',
-  'Find similar tickets to the database connection issue',
-  'Close ticket AUTH-204 and notify the backend team on Slack',
-  'Reassign ticket CORE-150 to james.wu',
+  'Create a high-priority ticket for the login bug',
+  'Find similar tickets to the database issue',
+  'Notify the backend team on Slack',
 ]
 
 export default function App() {
@@ -34,7 +33,7 @@ export default function App() {
     { id: 'agent', label: 'Agent', icon: <Mic size={16} /> },
     {
       id: 'audit',
-      label: 'Audit Log',
+      label: 'Audit',
       icon: <ClipboardList size={16} />,
       count: agent.auditLog.length,
     },
@@ -70,7 +69,7 @@ export default function App() {
               }}
             >
               {tab.icon}
-              <span>{tab.label}</span>
+              <span style={styles.tabLabel}>{tab.label}</span>
               {tab.count != null && tab.count > 0 && (
                 <span style={styles.badge}>{tab.count}</span>
               )}
@@ -116,7 +115,6 @@ export default function App() {
                 </div>
               </div>
             )}
-
             <ImpactCard data={agent.impact} />
           </div>
         )}
@@ -140,9 +138,7 @@ export default function App() {
       <footer style={styles.footer}>
         <span>VoiceOps Agent</span>
         <span style={styles.footerDot}>·</span>
-        <span>Powered by Elasticsearch Agent Builder</span>
-        <span style={styles.footerDot}>·</span>
-        <span>Hackathon 2026</span>
+        <span>Elasticsearch Agent Builder</span>
       </footer>
     </div>
   )
@@ -154,69 +150,78 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     background: colors.bgPrimary,
+    width: '100%',
+    overflowX: 'hidden',
   },
   tabs: {
     background: colors.bgSecondary,
     borderBottom: `1px solid ${colors.borderSubtle}`,
-    padding: '0 32px',
+    padding: '0 16px',
+    overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch',
   },
   tabsInner: {
     display: 'flex',
-    gap: 4,
-    maxWidth: 1200,
-    margin: '0 auto',
+    gap: 2,
+    minWidth: 'min-content',
   },
   tab: {
     display: 'flex',
     alignItems: 'center',
-    gap: 8,
-    padding: '14px 16px',
+    gap: 6,
+    padding: '12px 12px',
     border: 'none',
     background: 'transparent',
     color: colors.textMuted,
     cursor: 'pointer',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 500,
     borderBottom: '2px solid transparent',
     marginBottom: -1,
     transition: 'all 150ms ease',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   },
   tabActive: {
     color: colors.textPrimary,
     borderBottomColor: colors.primary,
   },
+  tabLabel: {
+    display: 'inline',
+  },
   badge: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 600,
     background: colors.primary,
     color: '#fff',
-    padding: '2px 6px',
+    padding: '2px 5px',
     borderRadius: '10px',
-    minWidth: 20,
+    minWidth: 18,
     textAlign: 'center',
   },
   main: {
     flex: 1,
-    padding: '32px',
+    padding: '16px',
     maxWidth: 1200,
     margin: '0 auto',
     width: '100%',
+    boxSizing: 'border-box',
   },
   agentLayout: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 24,
+    gap: 16,
   },
   error: {
-    padding: '14px 18px',
+    padding: '12px 14px',
     background: colors.errorBg,
     border: `1px solid ${colors.error}`,
     borderRadius: radius.md,
     color: colors.error,
-    fontSize: 14,
+    fontSize: 13,
   },
   samples: {
-    padding: 24,
+    padding: '16px',
     background: colors.bgCard,
     borderRadius: radius.lg,
     border: `1px solid ${colors.borderSubtle}`,
@@ -225,15 +230,15 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 14,
     fontWeight: 600,
     color: colors.textSecondary,
-    margin: '0 0 16px',
+    margin: '0 0 12px',
   },
   samplesGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
   },
   sampleBtn: {
-    padding: '14px 16px',
+    padding: '12px 14px',
     border: `1px solid ${colors.borderSubtle}`,
     borderRadius: radius.md,
     background: colors.bgElevated,
@@ -241,17 +246,18 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     fontSize: 13,
     textAlign: 'left',
-    lineHeight: 1.5,
+    lineHeight: 1.4,
     transition: 'all 150ms ease',
   },
   footer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    padding: '16px 32px',
+    flexWrap: 'wrap',
+    gap: 6,
+    padding: '12px 16px',
     borderTop: `1px solid ${colors.borderSubtle}`,
-    fontSize: 12,
+    fontSize: 11,
     color: colors.textMuted,
   },
   footerDot: {

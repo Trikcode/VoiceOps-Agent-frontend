@@ -21,26 +21,28 @@ export function Header({ health }: Props) {
     <header style={styles.header}>
       <div style={styles.brand}>
         <div style={styles.logoContainer}>
-          <Mic size={24} color={colors.primary} />
+          <Mic size={20} color={colors.primary} />
         </div>
         <div>
           <h1 style={styles.title}>VoiceOps</h1>
-          <p style={styles.tagline}>Voice-powered operations agent</p>
+          <p style={styles.tagline}>Voice-powered agent</p>
         </div>
       </div>
 
       <div style={styles.status}>
         <div style={styles.statusItem}>
           {isHealthy ? (
-            <CheckCircle2 size={16} color={colors.success} />
+            <CheckCircle2 size={14} color={colors.success} />
           ) : (
-            <XCircle size={16} color={colors.error} />
+            <XCircle size={14} color={colors.error} />
           )}
           <span
             style={{
               color: isHealthy ? colors.success : colors.error,
-              fontSize: 13,
+              fontSize: 12,
+              display: 'none',
             }}
+            className='status-text'
           >
             {isHealthy ? 'Connected' : 'Disconnected'}
           </span>
@@ -48,25 +50,26 @@ export function Header({ health }: Props) {
 
         {health?.jira_configured && (
           <Badge variant='success'>
-            <Ticket size={12} />
-            Jira
+            <Ticket size={10} />
+            <span style={styles.badgeText}>Jira</span>
           </Badge>
         )}
 
         {health?.slack_configured && (
           <Badge variant='info'>
-            <MessageSquare size={12} />
-            Slack
-          </Badge>
-        )}
-
-        {health?.indices && (
-          <Badge variant='default'>
-            <Database size={12} />
-            {health.indices['voiceops-tickets']} tickets
+            <MessageSquare size={10} />
+            <span style={styles.badgeText}>Slack</span>
           </Badge>
         )}
       </div>
+
+      <style>{`
+        @media (min-width: 640px) {
+          .status-text {
+            display: inline !important;
+          }
+        }
+      `}</style>
     </header>
   )
 }
@@ -76,45 +79,52 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '16px 32px',
+    padding: '12px 16px',
     background: colors.bgSecondary,
     borderBottom: `1px solid ${colors.borderSubtle}`,
+    gap: 12,
   },
   brand: {
     display: 'flex',
     alignItems: 'center',
-    gap: 14,
+    gap: 10,
   },
   logoContainer: {
-    width: 44,
-    height: 44,
+    width: 36,
+    height: 36,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     background: `linear-gradient(135deg, ${colors.primary}22, ${colors.primary}44)`,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
     border: `1px solid ${colors.primary}44`,
+    flexShrink: 0,
   },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 700,
     color: colors.textPrimary,
     margin: 0,
     letterSpacing: '-0.02em',
   },
   tagline: {
-    fontSize: 13,
+    fontSize: 11,
     color: colors.textMuted,
     margin: 0,
+    display: 'none',
   },
   status: {
     display: 'flex',
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
+    flexShrink: 0,
   },
   statusItem: {
     display: 'flex',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
+  },
+  badgeText: {
+    display: 'none',
   },
 }

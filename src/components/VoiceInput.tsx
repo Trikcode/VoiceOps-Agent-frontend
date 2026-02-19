@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Mic, Square, Loader2, ArrowRight } from 'lucide-react'
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder'
 import { api } from '../api/client'
-import { colors, radius, shadows, transitions } from '../styles/theme'
+import { colors, radius, transitions } from '../styles/theme'
 import { Button } from './ui/Button'
 
 interface Props {
@@ -75,28 +75,28 @@ export function VoiceInput({ isProcessing, onCommand }: Props) {
           <div style={styles.micInner}>
             {micState === 'transcribing' && (
               <Loader2
-                size={28}
+                size={24}
                 style={{ animation: 'spin 1s linear infinite' }}
               />
             )}
-            {micState === 'recording' && <Square size={24} />}
+            {micState === 'recording' && <Square size={20} />}
             {micState === 'processing' && (
               <Loader2
-                size={28}
+                size={24}
                 style={{ animation: 'spin 1s linear infinite' }}
               />
             )}
-            {micState === 'idle' && <Mic size={28} />}
+            {micState === 'idle' && <Mic size={24} />}
           </div>
 
           {micState === 'recording' && <div style={styles.pulseRing} />}
         </button>
 
         <p style={styles.micLabel}>
-          {micState === 'transcribing' && 'Transcribing audio...'}
-          {micState === 'recording' && 'Listening — click to stop'}
-          {micState === 'processing' && 'Agent is thinking...'}
-          {micState === 'idle' && 'Click to speak'}
+          {micState === 'transcribing' && 'Transcribing...'}
+          {micState === 'recording' && 'Listening...'}
+          {micState === 'processing' && 'Thinking...'}
+          {micState === 'idle' && 'Tap to speak'}
         </p>
       </div>
 
@@ -104,7 +104,7 @@ export function VoiceInput({ isProcessing, onCommand }: Props) {
 
       <div style={styles.divider}>
         <span style={styles.dividerLine} />
-        <span style={styles.dividerText}>or type a command</span>
+        <span style={styles.dividerText}>or type</span>
         <span style={styles.dividerLine} />
       </div>
 
@@ -113,16 +113,17 @@ export function VoiceInput({ isProcessing, onCommand }: Props) {
           type='text'
           value={manualInput}
           onChange={(e) => setManualInput(e.target.value)}
-          placeholder='Create a ticket for the login bug...'
+          placeholder='Create a ticket for...'
           style={styles.input}
           disabled={isBusy}
         />
         <Button
           onClick={() => {}}
           disabled={isBusy || !manualInput.trim()}
-          icon={<ArrowRight size={16} />}
+          size='sm'
+          icon={<ArrowRight size={14} />}
         >
-          Execute
+          Go
         </Button>
       </form>
 
@@ -145,22 +146,22 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 20,
-    padding: 32,
+    gap: 16,
+    padding: '24px 16px',
     background: colors.bgCard,
-    borderRadius: radius.xl,
+    borderRadius: radius.lg,
     border: `1px solid ${colors.borderSubtle}`,
   },
   micSection: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
   },
   micButton: {
     position: 'relative',
-    width: 88,
-    height: 88,
+    width: 72,
+    height: 72,
     borderRadius: '50%',
     border: `2px solid ${colors.primary}`,
     background: `linear-gradient(180deg, ${colors.bgElevated}, ${colors.bgCard})`,
@@ -170,12 +171,10 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'center',
     transition: transitions.default,
     color: colors.primary,
-    boxShadow: shadows.glow(colors.primary),
   },
   micRecording: {
     border: `2px solid ${colors.error}`,
     color: colors.error,
-    boxShadow: shadows.glow(colors.error),
   },
   micBusy: {
     border: `2px solid ${colors.warning}`,
@@ -190,30 +189,29 @@ const styles: Record<string, React.CSSProperties> = {
   },
   pulseRing: {
     position: 'absolute',
-    inset: -8,
+    inset: -6,
     borderRadius: '50%',
     border: `2px solid ${colors.error}`,
     animation: 'pulse 1.5s ease-out infinite',
   },
   micLabel: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.textSecondary,
     margin: 0,
   },
   error: {
-    fontSize: 13,
+    fontSize: 12,
     color: colors.error,
     margin: 0,
-    padding: '8px 16px',
+    padding: '6px 12px',
     background: colors.errorBg,
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
   },
   divider: {
     display: 'flex',
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
     width: '100%',
-    maxWidth: 500,
   },
   dividerLine: {
     flex: 1,
@@ -221,26 +219,24 @@ const styles: Record<string, React.CSSProperties> = {
     background: colors.borderSubtle,
   },
   dividerText: {
-    fontSize: 12,
+    fontSize: 11,
     color: colors.textMuted,
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
   },
   form: {
     display: 'flex',
-    gap: 12,
+    gap: 8,
     width: '100%',
-    maxWidth: 600,
   },
   input: {
     flex: 1,
-    padding: '12px 16px',
+    padding: '10px 12px',
     border: `1px solid ${colors.borderDefault}`,
     borderRadius: radius.md,
     background: colors.bgInput,
     color: colors.textPrimary,
     fontSize: 14,
     outline: 'none',
-    transition: transitions.fast,
+    minWidth: 0,
   },
 }

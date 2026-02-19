@@ -6,7 +6,7 @@ interface CardProps {
   highlight?: 'none' | 'success' | 'warning' | 'error' | 'primary'
 }
 
-const paddingMap = { none: 0, sm: 12, md: 20, lg: 28 }
+const paddingMap = { none: 0, sm: 12, md: 16, lg: 24 }
 const highlightMap = {
   none: colors.borderSubtle,
   success: colors.success,
@@ -29,6 +29,8 @@ export function Card({
         padding: paddingMap[padding],
         boxShadow:
           highlight !== 'none' ? shadows.glow(highlightMap[highlight]) : 'none',
+        width: '100%',
+        boxSizing: 'border-box',
       }}
     >
       {children}
