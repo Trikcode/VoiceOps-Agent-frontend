@@ -1,6 +1,6 @@
 import { Target, Search, Brain, AlertTriangle, Ticket } from 'lucide-react'
 import type { PipelineData } from '../types'
-import { colors, radius, priorityColors, statusColors } from '../styles/theme'
+import { colors, radius, priorityColors } from '../styles/theme'
 import { Card } from './ui/Card'
 import { Badge } from './ui/Badge'
 

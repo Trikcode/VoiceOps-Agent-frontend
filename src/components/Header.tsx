@@ -1,11 +1,4 @@
-import {
-  Mic,
-  Database,
-  MessageSquare,
-  CheckCircle2,
-  XCircle,
-  Ticket,
-} from 'lucide-react'
+import { Mic, MessageSquare, CheckCircle2, XCircle, Ticket } from 'lucide-react'
 import type { HealthStatus } from '../types'
 import { colors, radius } from '../styles/theme'
 import { Badge } from './ui/Badge'
