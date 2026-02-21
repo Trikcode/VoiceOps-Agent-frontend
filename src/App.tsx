@@ -55,7 +55,7 @@ export default function App() {
 
   return (
     <div style={styles.app}>
-      <Header health={agent.health} />
+      <Header health={agent.health} onHealthUpdate={agent.updateHealth} />
 
       <nav style={styles.tabs}>
         <div style={styles.tabsInner}>

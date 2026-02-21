@@ -1,14 +1,48 @@
-import { Mic, MessageSquare, CheckCircle2, XCircle, Ticket } from 'lucide-react'
+import { useState } from 'react'
+import {
+  Mic,
+  MessageSquare,
+  CheckCircle2,
+  XCircle,
+  Ticket,
+  RefreshCw,
+  Loader2,
+} from 'lucide-react'
 import type { HealthStatus } from '../types'
 import { colors, radius } from '../styles/theme'
 import { Badge } from './ui/Badge'
+import { api } from '../api/client'
 
 interface Props {
   health: HealthStatus | null
+  onHealthUpdate?: (health: HealthStatus) => void
 }
 
-export function Header({ health }: Props) {
+export function Header({ health, onHealthUpdate }: Props) {
+  const [isReconnecting, setIsReconnecting] = useState(false)
   const isHealthy = health?.status === 'healthy'
+
+  async function handleReconnect() {
+    setIsReconnecting(true)
+    try {
+      // This will wake up the Render backend
+      const newHealth = await api.health()
+      onHealthUpdate?.(newHealth)
+    } catch (error) {
+      console.error('Reconnect failed:', error)
+      setTimeout(async () => {
+        try {
+          const newHealth = await api.health()
+          onHealthUpdate?.(newHealth)
+        } catch {
+          // Still failed
+        }
+        setIsReconnecting(false)
+      }, 3000)
+      return
+    }
+    setIsReconnecting(false)
+  }
 
   return (
     <header style={styles.header}>
@@ -23,36 +57,71 @@ export function Header({ health }: Props) {
       </div>
 
       <div style={styles.status}>
+        {/* Connection Status */}
         <div style={styles.statusItem}>
-          {isHealthy ? (
-            <CheckCircle2 size={14} color={colors.success} />
+          {isReconnecting ? (
+            <>
+              <Loader2
+                size={14}
+                color={colors.warning}
+                style={{ animation: 'spin 1s linear infinite' }}
+              />
+              <span style={{ color: colors.warning, fontSize: 12 }}>
+                Connecting...
+              </span>
+            </>
+          ) : isHealthy ? (
+            <>
+              <CheckCircle2 size={14} color={colors.success} />
+              <span
+                style={{ color: colors.success, fontSize: 12 }}
+                className='status-text'
+              >
+                Connected
+              </span>
+            </>
           ) : (
-            <XCircle size={14} color={colors.error} />
+            <>
+              <XCircle size={14} color={colors.error} />
+              <span
+                style={{ color: colors.error, fontSize: 12 }}
+                className='status-text'
+              >
+                Disconnected
+              </span>
+            </>
           )}
-          <span
-            style={{
-              color: isHealthy ? colors.success : colors.error,
-              fontSize: 12,
-              display: 'none',
-            }}
-            className='status-text'
-          >
-            {isHealthy ? 'Connected' : 'Disconnected'}
-          </span>
         </div>
 
-        {health?.jira_configured && (
-          <Badge variant='success'>
-            <Ticket size={10} />
-            <span style={styles.badgeText}>Jira</span>
-          </Badge>
+        {/* Reconnect Button - Show when disconnected */}
+        {!isHealthy && !isReconnecting && (
+          <button
+            onClick={handleReconnect}
+            style={styles.reconnectBtn}
+            title='Wake up backend server'
+          >
+            <RefreshCw size={12} />
+            <span>Reconnect</span>
+          </button>
         )}
 
-        {health?.slack_configured && (
-          <Badge variant='info'>
-            <MessageSquare size={10} />
-            <span style={styles.badgeText}>Slack</span>
-          </Badge>
+        {/* Integration Badges - Only show when connected */}
+        {isHealthy && (
+          <>
+            {health?.jira_configured && (
+              <Badge variant='success'>
+                <Ticket size={10} />
+                <span style={styles.badgeText}>Jira</span>
+              </Badge>
+            )}
+
+            {health?.slack_configured && (
+              <Badge variant='info'>
+                <MessageSquare size={10} />
+                <span style={styles.badgeText}>Slack</span>
+              </Badge>
+            )}
+          </>
         )}
       </div>
 
@@ -61,6 +130,10 @@ export function Header({ health }: Props) {
           .status-text {
             display: inline !important;
           }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </header>
@@ -104,7 +177,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 11,
     color: colors.textMuted,
     margin: 0,
-    display: 'none',
   },
   status: {
     display: 'flex',
@@ -116,6 +188,20 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     gap: 4,
+  },
+  reconnectBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '6px 10px',
+    background: colors.warningBg,
+    border: `1px solid ${colors.warning}`,
+    borderRadius: radius.md,
+    color: colors.warning,
+    fontSize: 11,
+    fontWeight: 500,
+    cursor: 'pointer',
+    transition: 'all 150ms ease',
   },
   badgeText: {
     display: 'none',

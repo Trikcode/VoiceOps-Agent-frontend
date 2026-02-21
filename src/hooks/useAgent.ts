@@ -42,14 +42,29 @@ export function useAgent() {
     }
   }, [])
 
+  const updateHealth = useCallback(
+    (newHealth: HealthStatus) => {
+      setHealth(newHealth)
+      if (newHealth.status === 'healthy') {
+        refreshData()
+      }
+    },
+    [refreshData],
+  )
+
   useEffect(() => {
-    api
-      .health()
-      .then(setHealth)
-      .catch(() =>
-        setHealth({ status: 'unhealthy', elasticsearch: 'disconnected' }),
-      )
-    refreshData()
+    const checkHealth = async () => {
+      try {
+        const h = await api.health()
+        setHealth(h)
+        refreshData()
+      } catch {
+        setHealth({ status: 'unhealthy', elasticsearch: 'disconnected' })
+        setTimeout(checkHealth, 5000)
+      }
+    }
+
+    checkHealth()
   }, [refreshData])
 
   const processCommand = useCallback(async (transcript: string) => {
@@ -120,5 +135,6 @@ export function useAgent() {
     confirmAction,
     clearResult,
     refreshData,
+    updateHealth,
   }
 }
